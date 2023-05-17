@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>XLSX File Upload Results</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin: 0 0 20px;
+        text-align: center;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+      .highlight {
+        background-color: yellow;
+      }
+    </style>
+  </head>
+  <body>
+        <h1>XLSX File Upload Results</h1>
+        <p><a href="/download">Download output file</a></p>
+        <table>
+          <thead>
+            <tr>
+              <% headers.forEach(header => { %>
+                <th><%= header %></th>
+              <% }); %>
+            </tr>
+          </thead>
+          <tbody>
+            <% rows.forEach(row => { %>
+              <% if (row[8] === "NA") { %>
+                <tr class="highlight">
+              <% } else { %>
+                <tr>
+              <% } %>
+                <% row.forEach(cell => { %>
+                  <td><%= cell %></td>
+                <% }); %>
+                </tr>
+            <% }); %>
+          </tbody>
+    </table>
+  </body>
+</html>
