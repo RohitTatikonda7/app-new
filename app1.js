@@ -20,10 +20,10 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const filePath = req.file.path;
     await generateOutput(filePath);
-    const outputBuffer = await fs.readFile('output1.xlsx');
+    const outputBuffer = await fs.readFile('output.xlsx');
     console.log(outputBuffer)
-    const outputData = xlsx.parse(outputBuffer)[0].data.slice(1);;
-
+    const outputData = xlsx.parse(outputBuffer)[0].data.slice(1);
+    
     const data = {
       rows: outputData,
       headers: ['Job ID','WF Name','Description','Task ID', 'Parent ID','Month','Year', 'Topmost Parent Job ID', 'Topmost Parent Workflow Name']
@@ -37,7 +37,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 app.get('/download', (req, res) => {
-  res.download('output1.xlsx');
+  res.download('output.xlsx');
 });
 
 app.listen(3000, () => {

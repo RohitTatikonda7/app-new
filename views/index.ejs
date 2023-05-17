@@ -1,13 +1,53 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>XLSX File Uploader</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+      form {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        margin-top: 10%;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+      input[type="file"] {
+        display: block;
+        margin-bottom: 20px;
+        
+      }
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      input[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+    </style>
   </head>
   <body>
-    <h1>XLSX File Uploader</h1>
     <form action="/upload" method="post" enctype="multipart/form-data">
+      <h1>Upload XLSX File</h1>
       <label for="file">Select an XLSX file to upload:</label>
       <input type="file" id="file" name="file" accept=".xlsx">
-      <br>
       <input type="submit" value="Upload">
     </form>
   </body>

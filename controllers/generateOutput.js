@@ -65,13 +65,15 @@ async function generateOutput(fileName) {
   const headers = Object.keys(data[0]);
   const rows = data.map(obj => Object.values(obj));
   const sheetData = [headers, ...rows];
+  console.log(sheetData)
   const buffer = xlsx.build([{ name: 'Sheet 1', data: sheetData }]);
 
   try {
-    await fs.writeFile('output1.xlsx', buffer);
+    await fs.writeFile('output.xlsx', buffer);
     return buffer;
   } catch (error) {
     console.error(error);
+    return error
   }
 }
 

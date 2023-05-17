@@ -5,10 +5,10 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.5;
         margin: 0;
-        padding: 0;
+        padding: 10px;
       }
 
       h1 {
@@ -18,17 +18,19 @@
       }
 
       table {
-        border-collapse: collapse;
-        margin: 0 auto;
-        width: 100%;
-      }
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 100%;
+  table-layout: fixed;
+}
 
-      th, td {
-        border: 1px solid #ccc;
-        padding: 10px;
-        text-align: center;
-      }
 
+th, td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  word-break: break-word;
+}
       th {
         background-color: #f2f2f2;
         font-weight: bold;
@@ -45,32 +47,76 @@
       .highlight {
         background-color: yellow;
       }
+      .search {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
     </style>
   </head>
   <body>
-        <h1>XLSX File Upload Results</h1>
-        <p><a href="/download">Download output file</a></p>
-        <table>
-          <thead>
+    <h1>Results</h1>
+    <p style="text-align: end;"><a href="/download">Download output file</a></p>
+    <% headers.forEach(header => { %>
+      <input type="text" class="search" placeholder="Search <%= header %>" data-index="<%= headers.indexOf(header) %>" style="width: 10.8%" />
+    <% }); %>
+    <table>
+      <thead>
+        <tr>
+          <% headers.forEach(header => { %>
+            <th><%= header %></th>
+          <% }); %>
+        </tr>
+      </thead>
+      <tbody>
+        <% rows.forEach((row, index) => { %>
+          <% if (row[8] === "NA") { %>
+            <tr class="highlight">
+          <% } else { %>
             <tr>
-              <% headers.forEach(header => { %>
-                <th><%= header %></th>
-              <% }); %>
-            </tr>
-          </thead>
-          <tbody>
-            <% rows.forEach(row => { %>
-              <% if (row[8] === "NA") { %>
-                <tr class="highlight">
-              <% } else { %>
-                <tr>
-              <% } %>
-                <% row.forEach(cell => { %>
-                  <td><%= cell %></td>
-                <% }); %>
-                </tr>
+          <% } %>
+            <% row.forEach(cell => { %>
+              <td><%= cell %></td>
             <% }); %>
-          </tbody>
+          </tr>
+        <% }); %>
+      </tbody>
     </table>
+    <script>
+      const searchFields = document.querySelectorAll('.search');
+      const rows = document.querySelectorAll('tbody tr');
+
+      const searchTable = () => {
+        const searchValues = Array.from(searchFields).map(searchField => {
+          return searchField.value.toLowerCase();
+        });
+
+        rows.forEach(row => {
+          let rowVisible = true;
+
+          const cells = row.querySelectorAll('td');
+
+          cells.forEach((cell, index) => {
+            const cellContent = cell.textContent.toLowerCase();
+
+            if (cellContent.indexOf(searchValues[index]) === -1) {
+              rowVisible = false;
+            }
+          });
+
+          if (rowVisible) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      };
+
+      searchFields.forEach(searchField => {
+        searchField.addEventListener('keyup', searchTable);
+      });
+    </script>
   </body>
 </html>
