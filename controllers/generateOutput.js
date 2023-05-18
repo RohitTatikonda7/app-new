@@ -31,6 +31,23 @@ async function readExcelFile(fileName) {
     const sheets = xlsx.parse(fileName);
     const sheetData = sheets[0].data;
     const headers = sheetData[0];
+    const requiredHeaders = [
+      'Job ID',
+      'WF Name',
+      'Description',
+      'Task ID',
+      'Parent ID',
+      'Month',
+      'Year'
+    ];
+
+    // Check if all required headers are present
+    const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+    if (missingHeaders.length > 0) {
+      console.log('Missing headers:', missingHeaders);
+      return null;
+    }
+
     const rows = sheetData.slice(1);
     const data = rows
       .filter(row => row.some(cell => cell !== ''))
@@ -41,12 +58,14 @@ async function readExcelFile(fileName) {
         });
         return obj;
       });
+    console.log(headers);
     return data;
   } catch (error) {
     console.error(error);
     return null;
   }
 }
+
 
 async function generateOutput(fileName) {
   const data = await readExcelFile(fileName);
@@ -68,7 +87,7 @@ async function generateOutput(fileName) {
   const headers = Object.keys(data[0]);
   const rows = data.map(obj => Object.values(obj));
   const sheetData = [headers, ...rows];
-  console.log(sheetData)
+  // console.log(sheetData)
   const buffer = xlsx.build([{ name: 'Sheet 1', data: sheetData }]);
 
   try {

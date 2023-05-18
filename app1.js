@@ -13,20 +13,32 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index',{ errorMessage: '' });
 });
 
-app.post('/upload', upload.single('file'), async (req, res) => {
+app.post('/', upload.single('file'), async (req, res) => {
   try {
+    if (!req.file) {
+      console.log('No file uploaded');
+      return res.render('index', { errorMessage: 'No file uploaded' });
+    }
+
     const filePath = req.file.path;
-    await generateOutput(filePath);
+    console.log(req.file.originalname);
+
+    const output = await generateOutput(filePath);
+    if (!output) {
+      console.log('Invalid file');
+      return res.render('index', { errorMessage: 'File not uploaded properly.' });
+    }
+
     const outputBuffer = await fs.readFile('output.xlsx');
-    console.log(outputBuffer)
+    console.log(outputBuffer);
     const outputData = xlsx.parse(outputBuffer)[0].data.slice(1);
     
     const data = {
       rows: outputData,
-      headers: ['Job ID','WF Name','Description','Task ID', 'Parent ID','Month','Year', 'Topmost Parent Job ID', 'Topmost Parent Workflow Name']
+      headers: ['Job ID', 'WF Name', 'Description', 'Task ID', 'Parent ID', 'Month', 'Year', 'Topmost Parent Job ID', 'Topmost Parent Workflow Name']
     };
 
     res.render('results', data);
@@ -35,6 +47,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     res.sendStatus(500);
   }
 });
+
 
 app.get('/download', (req, res) => {
   res.download('output.xlsx');

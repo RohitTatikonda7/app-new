@@ -58,7 +58,10 @@ th, td {
   </head>
   <body>
     <h1>Results</h1>
-    <p style="text-align: end;"><a href="/download">Download output file</a></p>
+    <div style="display: flex;justify-content: space-around;">
+      <p><a href="/download">Download output file</a></p>
+      <p><a href="/">Go Back</a></p>
+    </div>
     <% headers.forEach(header => { %>
       <input type="text" class="search" placeholder="Search <%= header %>" data-index="<%= headers.indexOf(header) %>" style="width: 10.8%" />
     <% }); %>
@@ -74,6 +77,8 @@ th, td {
         <% rows.forEach((row, index) => { %>
           <% if (row[8] === "NA") { %>
             <tr class="highlight">
+          <% } else if(row[8] === "Not Found") { %>
+            <tr style="background-color: red;">
           <% } else { %>
             <tr>
           <% } %>
