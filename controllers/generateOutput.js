@@ -2,9 +2,12 @@ const xlsx = require('node-xlsx');
 const fs = require('fs/promises');
 
 async function findTopMostParentJob(jobs, jobId) {
+  if(jobId=='undefined'){
+    return { jobId: 'NA', workflowName: 'NA' };
+  }
   const job = jobs.find(job => job['Job ID'] === jobId);
   if (!job) {
-    return null;
+    return { jobId: 'Not Found', workflowName: 'Not Found' };
   }
 
   let parentJobId = job['Parent ID'];
@@ -13,14 +16,14 @@ async function findTopMostParentJob(jobs, jobId) {
   while (parentJobId !== 'undefined') {
     const parentJob = jobs.find(job => job['Job ID'] === parentJobId);
     if (!parentJob) {
-      return null;
+      return { jobId: 'Not Found', workflowName: 'Not Found' };
     }
     parentJobId = parentJob['Parent ID'];
     if (parentJobId === 'undefined') {
       return { jobId: parentJob['Job ID'], workflowName: parentJob['WF Name'] };
     }
   }
-  return { jobId: jobId, workflowName: workflowName };
+  return { jobId: job['Job ID'], workflowName: workflowName };
 }
 
 async function readExcelFile(fileName) {
