@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>XLSX File Upload Results</title>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -59,13 +60,13 @@ th, td {
   <body>
     <h1>Results</h1>
     <div style="display: flex;justify-content: space-around;">
-      <p><a href="/download">Download output file</a></p>
+      <p><button id="downloadBtn" onclick="downloadExcel()">Download Excel</button></p>
       <p><a href="/">Go Back</a></p>
     </div>
     <% headers.forEach(header => { %>
       <input type="text" class="search" placeholder="Search <%= header %>" data-index="<%= headers.indexOf(header) %>" style="width: 10.8%" />
     <% }); %>
-    <table>
+    <table id="table">
       <thead>
         <tr>
           <% headers.forEach(header => { %>
@@ -122,6 +123,34 @@ th, td {
       searchFields.forEach(searchField => {
         searchField.addEventListener('keyup', searchTable);
       });
+
+      function downloadExcel() {
+    // Get the table data
+    var table = document.getElementById('table');
+    var rows = Array.from(table.rows);
+
+    // Create a new workbook and worksheet
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.table_to_sheet(table);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Convert the workbook to an Excel file buffer
+    var excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    // Create a Blob from the buffer
+    var blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    // Create a temporary anchor element to trigger the download
+    var a = document.createElement('a');
+    document.body.appendChild(a);
+    a.href = URL.createObjectURL(blob);
+    a.download = 'output.xlsx';
+    a.click();
+    document.body.removeChild(a);
+  }
     </script>
+
   </body>
 </html>
