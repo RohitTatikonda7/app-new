@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>XLSX File Upload Results</title>
+    <title>Result</title>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <style>
       body {
@@ -10,6 +10,7 @@
         line-height: 1.5;
         margin: 0;
         padding: 10px;
+        background-color: #f8f8f8;
       }
 
       h1 {
@@ -19,19 +20,20 @@
       }
 
       table {
-  border-collapse: collapse;
-  margin: 0 auto;
-  width: 100%;
-  table-layout: fixed;
-}
+        border-collapse: collapse;
+        margin: 0 auto;
+        width: 100%;
+        table-layout: fixed;
+      }
 
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+        word-break: break-word;
+      }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-  word-break: break-word;
-}
       th {
         background-color: #f2f2f2;
         font-weight: bold;
@@ -45,9 +47,11 @@ th, td {
       a:hover {
         text-decoration: underline;
       }
+
       .highlight {
         background-color: yellow;
       }
+
       .search {
         width: 100%;
         padding: 5px;
@@ -55,46 +59,146 @@ th, td {
         box-sizing: border-box;
         font-size: 14px;
       }
+
+      /* Additional styles */
+      #downloadBtnContainer {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      #downloadBtn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+
+      #downloadBtn:hover {
+        background-color: #0056b3;
+      }
+
+      #backBtnContainer {
+        text-align: right;
+        margin-bottom: 20px;
+      }
+
+      #backBtn {
+        background-color: #fff;
+        color: #007bff;
+        border: 1px solid #007bff;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      #backBtn:hover {
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+      }
+
+      #searchContainer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .search-input {
+        width: calc(100% / <%= headers.length %>);
+        padding: 5px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+
+      #applyBtnContainer {
+        width: 100%;
+        text-align: center;
+      }
+
+      #tableContainer {
+        overflow-x: auto;
+        margin-top: 20px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
+      }
+
+      #applyBtn {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      #applyBtn:hover {
+        background-color: #0056b3;
+      }
     </style>
   </head>
   <body>
-    <h1>Results</h1>
-    <div style="display: flex;justify-content: space-around;">
-      <p><button id="downloadBtn" onclick="downloadExcel()">Download Excel</button></p>
-      <p><a href="/">Go Back</a></p>
+    <div id="backBtnContainer">
+      <a href="/" id="backBtn">Go Back</a>
     </div>
-    <% headers.forEach(header => { %>
-      <input type="text" class="search" placeholder="Search <%= header %>" data-index="<%= headers.indexOf(header) %>" style="width: 10.8%" />
-    <% }); %>
-    <table id="table">
-      <thead>
-        <tr>
-          <% headers.forEach(header => { %>
+    <h1>Output</h1>
+    <div id="downloadBtnContainer">
+      <button id="downloadBtn" onclick="downloadExcel()">Download Excel</button>
+    </div>
+    <div id="searchContainer">
+      <% headers.forEach(header => { %>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search <%= header %>"
+        data-index="<%= headers.indexOf(header) %>"
+      />
+      <% }); %>
+    </div>
+    <div id="applyBtnContainer">
+      <button id="applyBtn" onclick="applySearch()">Apply</button>
+    </div>
+    <div id="tableContainer">
+      <table id="table">
+        <thead>
+          <tr>
+            <% headers.forEach(header => { %>
             <th><%= header %></th>
-          <% }); %>
-        </tr>
-      </thead>
-      <tbody>
-        <% rows.forEach((row, index) => { %>
-          <% if (row[8] === "NA") { %>
-            <tr class="highlight">
-          <% } else if(row[8] === "Not Found") { %>
-            <tr style="background-color: red;">
-          <% } else { %>
-            <tr>
-          <% } %>
-            <% row.forEach(cell => { %>
-              <td><%= cell %></td>
             <% }); %>
           </tr>
-        <% }); %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% rows.slice(1).forEach((row, index) => { %>
+            <% if (row[8] === "NA") { %>
+            <tr class="highlight">
+            <% } else if(row[8] === "Not Found") { %>
+            <tr style="background-color: red;">
+            <% } else { %>
+            <tr>
+            <% } %>
+            <% row.forEach(cell => { %>
+            <td><%= cell %></td>
+            <% }); %>
+            </tr>
+          <% }); %>          
+        </tbody>
+      </table>
+    </div>
     <script>
-      const searchFields = document.querySelectorAll('.search');
-      const rows = document.querySelectorAll('tbody tr');
+      const searchFields = document.querySelectorAll(".search-input");
+      const rows = document.querySelectorAll("tbody tr");
 
-      const searchTable = () => {
+      function applySearch() {
         const searchValues = Array.from(searchFields).map(searchField => {
           return searchField.value.toLowerCase();
         });
@@ -102,7 +206,7 @@ th, td {
         rows.forEach(row => {
           let rowVisible = true;
 
-          const cells = row.querySelectorAll('td');
+          const cells = row.querySelectorAll("td");
 
           cells.forEach((cell, index) => {
             const cellContent = cell.textContent.toLowerCase();
@@ -113,44 +217,38 @@ th, td {
           });
 
           if (rowVisible) {
-            row.style.display = '';
+            row.style.display = "";
           } else {
-            row.style.display = 'none';
+            row.style.display = "none";
           }
         });
-      };
+      }
 
-      searchFields.forEach(searchField => {
-        searchField.addEventListener('keyup', searchTable);
-      });
+      const rowsData = Object.values(<%- JSON.stringify(rows) %>);
 
-      function downloadExcel() {
-    // Get the table data
-    var table = document.getElementById('table');
-    var rows = Array.from(table.rows);
+function downloadExcel() {
+  // Use the rowsData variable here to generate the Excel file
+  var workbook = XLSX.utils.book_new();
+  var worksheet = XLSX.utils.json_to_sheet(rowsData, { skipHeader: true });
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-    // Create a new workbook and worksheet
-    var workbook = XLSX.utils.book_new();
-    var worksheet = XLSX.utils.table_to_sheet(table);
+  var excelBuffer = XLSX.write(workbook, {
+    type: "buffer",
+    bookType: "xlsx",
+  });
 
-    // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  var blob = new Blob([excelBuffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
 
-    // Convert the workbook to an Excel file buffer
-    var excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  var a = document.createElement("a");
+  document.body.appendChild(a);
+  a.href = URL.createObjectURL(blob);
+  a.download = "output.xlsx";
+  a.click();
+  document.body.removeChild(a);
+}
 
-    // Create a Blob from the buffer
-    var blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-    // Create a temporary anchor element to trigger the download
-    var a = document.createElement('a');
-    document.body.appendChild(a);
-    a.href = URL.createObjectURL(blob);
-    a.download = 'output.xlsx';
-    a.click();
-    document.body.removeChild(a);
-  }
     </script>
-
   </body>
 </html>

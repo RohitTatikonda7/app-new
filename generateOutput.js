@@ -94,7 +94,7 @@ async function generateOutput(fileName) {
     return buffer;
   } catch (error) {
     console.error(error);
-    return error
+    return null
   }
 }
 
