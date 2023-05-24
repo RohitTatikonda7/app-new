@@ -72,20 +72,24 @@ async function generateOutput(fileName) {
   if (!data) {
     return;
   }
-
+  let outdata=[],j=0;
   for (let i = 0; i < data.length; i++) {
-    let currentTopMost = await findTopMostParentJob(data, data[i]['Parent ID']);
-    if (currentTopMost != null) {
-      data[i]['Topmost Parent JobId'] = currentTopMost['jobId'];
-      data[i]['Topmost Parent Workflow Name'] = currentTopMost['workflowName'];
-    } else {
-      data[i]['Topmost Parent JobId'] = 'NA';
-      data[i]['Topmost Parent Workflow Name'] = 'NA';
+    if(!data.some(obj=>obj['Parent ID']===data[i]['Job ID'])){
+      let currentTopMost = await findTopMostParentJob(data, data[i]['Parent ID']);
+      if (currentTopMost != null) {
+        outdata[j]=data[i]
+        outdata[j]['Topmost Parent JobId'] = currentTopMost['jobId'];
+        outdata[j]['Topmost Parent Workflow Name'] = currentTopMost['workflowName'];
+      } else {
+        outdata[j]['Topmost Parent JobId'] = 'NA';
+        outdata[j]['Topmost Parent Workflow Name'] = 'NA';
+      }
+      j=j+1
     }
   }
 
-  const headers = Object.keys(data[0]);
-  const rows = data.map(obj => Object.values(obj));
+  const headers = Object.keys(outdata[0]);
+  const rows = outdata.map(obj => Object.values(obj));
   const sheetData = [headers, ...rows];
   const buffer = xlsx.build([{ name: 'Sheet 1', data: sheetData }]);
 
